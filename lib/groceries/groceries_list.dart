@@ -21,7 +21,7 @@ class GroceriesList extends StatelessWidget with ImageMixin {
                   child: GridView.builder(
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
                   itemCount: model.entityList.length,
-                  itemBuilder: (BuildContext context, int index) => buildCard(model, model.entityList[index]),
+                  itemBuilder: (BuildContext context, int index) => buildSlidable(context, model, model.entityList[index]),
                 )),
           RaisedButton(child: Text('Renew DB'), onPressed: () => GroceriesDBWorker.db.upgradeTable())
         ]),
@@ -44,8 +44,9 @@ class GroceriesList extends StatelessWidget with ImageMixin {
 
   Widget buildSlidable(BuildContext context, GroceriesModel model, Grocery item) => Slidable(
         actionPane: SlidableDrawerActionPane(),
+        actionExtentRatio: .25,
         child: buildCard(model, item),
-        secondaryActions: [IconSlideAction(caption: "Delete", color: Colors.red, icon: Icons.delete, onTap: () => _deleteGrocery(context, item)), Divider()],
+        secondaryActions: [IconSlideAction(caption: "Delete", color: Colors.red, icon: Icons.delete, onTap: () => _deleteGrocery(context, item))],
       );
 
   Widget buildCard(GroceriesModel model, Grocery item) {
@@ -80,8 +81,7 @@ class GroceriesList extends StatelessWidget with ImageMixin {
 
   void _editGrocery(GroceriesModel model, Grocery grocery) async {
     File tempFile = imageTempFile();
-    if (tempFile.existsSync())
-      tempFile.deleteSync();
+    if (tempFile.existsSync()) tempFile.deleteSync();
 
     model.entityBeingEdited = await GroceriesDBWorker.db.get(grocery.id);
     groceriesModel.setStackIndex(1);

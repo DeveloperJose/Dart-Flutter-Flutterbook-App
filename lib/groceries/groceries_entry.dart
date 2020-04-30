@@ -1,3 +1,4 @@
+// Author: Jose G. Perez
 import 'dart:io';
 import 'dart:typed_data';
 

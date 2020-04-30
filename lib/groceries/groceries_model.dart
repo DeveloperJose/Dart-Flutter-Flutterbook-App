@@ -1,3 +1,4 @@
+// Author: Jose G. Perez
 import 'package:flutterbook/base_model.dart';
 
 GroceriesModel groceriesModel = GroceriesModel();

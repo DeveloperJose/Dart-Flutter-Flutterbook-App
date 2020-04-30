@@ -1,3 +1,4 @@
+// Author: Jose G. Perez
 import 'package:firebase_database/firebase_database.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -24,7 +25,7 @@ abstract class GroceriesDBWorker {
 }
 
 class GroceriesFirebaseDB implements GroceriesDBWorker {
-  var db = FirebaseDatabase.instance.reference();
+  var _db = FirebaseDatabase.instance.reference();
 
   GroceriesFirebaseDB._() {
 //    FirebaseDatabase.instance.reference().child('groceries').child('0').set({'name': 'Hibiscus', 'storeNames': 'Walmart|Sams', 'storePrices': '1.00|2.00'});
@@ -36,7 +37,7 @@ class GroceriesFirebaseDB implements GroceriesDBWorker {
 
   @override
   Future<int> create(Grocery grocery) {
-    return db.child('groceries').once().then((DataSnapshot dataSnapshot) {
+    return _db.child('groceries').once().then((DataSnapshot dataSnapshot) {
       if (grocery.id == null) {
         int newKey = dataSnapshot.value?.length ?? 0;
         grocery.id = newKey;
@@ -48,12 +49,12 @@ class GroceriesFirebaseDB implements GroceriesDBWorker {
 
   @override
   Future<void> delete(int id) {
-    return db.child('groceries').child(id.toString()).remove();
+    return _db.child('groceries').child(id.toString()).remove();
   }
 
   @override
   Future<Grocery> get(int id) {
-    return db.child('groceries').child(id.toString()).once().then((DataSnapshot dataSnapshot) {
+    return _db.child('groceries').child(id.toString()).once().then((DataSnapshot dataSnapshot) {
       return Grocery()
         ..id = id
         ..name = dataSnapshot.value['name']
@@ -63,7 +64,7 @@ class GroceriesFirebaseDB implements GroceriesDBWorker {
 
   @override
   Future<List<Grocery>> getAll() {
-    return db.child('groceries').once().then((DataSnapshot dataSnapshot) {
+    return _db.child('groceries').once().then((DataSnapshot dataSnapshot) {
       if (dataSnapshot.value.length == 0) return [];
       var result = List<Grocery>();
       for (int i = 0; i < dataSnapshot.value.length; i++) {
@@ -82,7 +83,7 @@ class GroceriesFirebaseDB implements GroceriesDBWorker {
 
   @override
   Future<void> update(Grocery grocery) {
-    return db.child('groceries').child(grocery.id.toString()).update({'name': grocery.name, 'storeNames': grocery.getStoreNames(), 'storePrices': grocery.getPrices()});
+    return _db.child('groceries').child(grocery.id.toString()).update({'name': grocery.name, 'storeNames': grocery.getStoreNames(), 'storePrices': grocery.getPrices()});
   }
 
   List<ItemDetail> _detailsFromJSON(var json) {

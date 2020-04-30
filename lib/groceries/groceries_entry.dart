@@ -6,6 +6,7 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutterbook/image_mixin.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:scoped_model/scoped_model.dart';
+import 'package:spinner_input/spinner_input.dart';
 
 import 'groceries_dbworker.dart';
 import 'groceries_model.dart';
@@ -96,18 +97,34 @@ class GroceriesEntry extends StatelessWidget with ImageMixin {
 
   /// Builds the form field that edits the price of one store
   ListTile _buildStorePriceEditor(GroceriesModel model, int index) => ListTile(
-      leading: Icon(Icons.attach_money),
-      title: TextFormField(
-        controller: _buildStorePriceController(model, index),
-        keyboardType: TextInputType.numberWithOptions(signed: false, decimal: true),
-        decoration: InputDecoration(hintText: 'Price'),
-        validator: (newPrice) {
-          if (newPrice.isEmpty) return 'Please select a price';
-          double num = double.tryParse(newPrice);
-          if (num == null || num <= 0) return 'Please select a valid price';
-          return null;
-        },
-      ));
+        leading: Icon(Icons.attach_money),
+        title: SpinnerInput(
+          minValue: 0,
+          maxValue: double.maxFinite,
+          fractionDigits: 2,
+          step: 1,
+          plusButton: SpinnerButtonStyle(elevation: 0, color: Colors.blue, borderRadius: BorderRadius.circular(0)),
+          minusButton: SpinnerButtonStyle(elevation: 0, color: Colors.red, borderRadius: BorderRadius.circular(0)),
+          middleNumberWidth: 125,
+          middleNumberStyle: TextStyle(fontSize: 21),
+          middleNumberBackground: Colors.yellowAccent.withOpacity(0.5),
+          spinnerValue: model.details[index].price,
+          onChange: (newValue) {
+            model.details[index].price = newValue;
+            model.triggerRebuild();
+          },
+        ),
+//      title: TextFormField(
+//        controller: _buildStorePriceController(model, index),
+//        keyboardType: TextInputType.numberWithOptions(signed: false, decimal: true),
+//        decoration: InputDecoration(hintText: 'Price'),
+//        validator: (newPrice) {
+//          if (newPrice.isEmpty) return 'Please select a price';
+//          double num = double.tryParse(newPrice);
+//          if (num == null || num <= 0) return 'Please select a valid price';
+//          return null;
+//        },
+      );
 
   /// Builds the controller in charge of updating the item name editing field
   TextEditingController _buildItemNameController(GroceriesModel model) {

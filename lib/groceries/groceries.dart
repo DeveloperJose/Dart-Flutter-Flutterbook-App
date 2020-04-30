@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 
+import 'groceries_dbworker.dart';
 import 'groceries_entry.dart';
 import 'groceries_list.dart';
 import 'groceries_model.dart' show GroceriesModel, groceriesModel;
 
 class Groceries extends StatelessWidget {
   Groceries() {
-//    groceries_model.loadData(GroceriesDBWorker.db);
+    groceriesModel.loadData(GroceriesDBWorker.db);
   }
 
   @override

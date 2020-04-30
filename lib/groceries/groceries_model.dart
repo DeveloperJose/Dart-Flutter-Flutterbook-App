@@ -4,19 +4,24 @@ GroceriesModel groceriesModel = GroceriesModel();
 
 class ItemDetail {
   String storeName;
-  double currentPrice;
+  double price;
 
-  ItemDetail({this.storeName = 'Example Store', this.currentPrice = 0.00});
+  ItemDetail({this.storeName, this.price});
 
   @override
-  String toString() => '[storeName=$storeName, currentPrice=$currentPrice]';
+  String toString() => '[storeName=$storeName, currentPrice=$price]';
 }
 
 class Grocery {
   int id;
+
+  String name;
   List<ItemDetail> details = [];
 
-  String toString() => "{ id=$id, details=${details.join(',')} }";
+  String getStoreNames() => details.map((detail) => detail.storeName).join(',');
+  String getPrices() => details.map((detail) => detail.price).join(', ');
+
+  String toString() => "{ id=$id, name=$name, details=${details.join(',')} }";
 }
 
 class GroceriesModel extends BaseModel<Grocery> {
@@ -30,4 +35,6 @@ class GroceriesModel extends BaseModel<Grocery> {
   void clear(){
     details.clear();
   }
+
+  String toString() => "{ details=${details.join(',')} }";
 }

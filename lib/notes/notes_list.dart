@@ -28,13 +28,7 @@ class NotesList extends StatelessWidget {
                     child: Slidable(
                         actionPane: SlidableDrawerActionPane(),
                         actionExtentRatio: .25,
-                        secondaryActions: [
-                          IconSlideAction(
-                              caption: "Delete",
-                              color: Colors.red,
-                              icon: Icons.delete,
-                              onTap: () => _deleteNote(context, model, note))
-                        ],
+                        secondaryActions: [IconSlideAction(caption: "Delete", color: Colors.red, icon: Icons.delete, onTap: () => _deleteNote(context, model, note))],
                         child: Card(
                             elevation: 8,
                             color: color,
@@ -56,27 +50,23 @@ class NotesList extends StatelessWidget {
         context: context,
         barrierDismissible: false,
         builder: (BuildContext alertContext) {
-          return AlertDialog(
-              title: Text("Delete Note"),
-              content: Text("Are you sure you want to delete ${note.title}?"),
-              actions: [
-                FlatButton(
-                    child: Text("Cancel"),
-                    onPressed: () {
-                      Navigator.of(alertContext).pop();
-                    }),
-                FlatButton(
-                    child: Text("Delete"),
-                    onPressed: () async {
-                      //model.noteList.remove(note);
-                      //model.setStackIndex(0);
-                      await NotesDBWorker.db.delete(note.id);
-                      Navigator.of(alertContext).pop();
-                      Scaffold.of(context).showSnackBar(
-                          SnackBar(backgroundColor: Colors.red, duration: Duration(seconds: 2), content: Text("Note deleted")));
-                      model.loadData(NotesDBWorker.db);
-                    })
-              ]);
+          return AlertDialog(title: Text("Delete Note"), content: Text("Are you sure you want to delete ${note.title}?"), actions: [
+            FlatButton(
+                child: Text("Cancel"),
+                onPressed: () {
+                  Navigator.of(alertContext).pop();
+                }),
+            FlatButton(
+                child: Text("Delete"),
+                onPressed: () async {
+                  //model.noteList.remove(note);
+                  //model.setStackIndex(0);
+                  await NotesDBWorker.db.delete(note.id);
+                  Navigator.of(alertContext).pop();
+                  Scaffold.of(context).showSnackBar(SnackBar(backgroundColor: Colors.red, duration: Duration(seconds: 2), content: Text("Note deleted")));
+                  model.loadData(NotesDBWorker.db);
+                })
+          ]);
         });
   }
 }

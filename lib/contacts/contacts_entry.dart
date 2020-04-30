@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:scoped_model/scoped_model.dart';
 
+import '../image_mixin.dart';
 import '../utils.dart' as utils;
-import '../avatar.dart';
 import 'contacts_dbworker.dart';
 import 'contacts_model.dart';
 
@@ -122,8 +122,7 @@ class ContactsEntry extends StatelessWidget with ImageMixin {
                         icon: Icon(Icons.edit),
                         color: Colors.blue,
                         onPressed: () async {
-                          String chosenDate =
-                              await utils.selectDate(context, contactsModel, contactsModel.entityBeingEdited.birthday);
+                          String chosenDate = await utils.selectDate(context, contactsModel, contactsModel.entityBeingEdited.birthday);
                           if (chosenDate != null) {
                             contactsModel.entityBeingEdited.birthday = chosenDate;
                           }

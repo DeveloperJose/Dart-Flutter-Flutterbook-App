@@ -22,8 +22,7 @@ Color strToColor(String colorStr) {
 
 Future<String> selectDate(BuildContext context, dynamic model, String date) async {
   DateTime initialDate = date != null ? toDate(date) : DateTime.now();
-  DateTime picked =
-      await showDatePicker(context: context, initialDate: initialDate, firstDate: DateTime(1900), lastDate: DateTime(2100));
+  DateTime picked = await showDatePicker(context: context, initialDate: initialDate, firstDate: DateTime(1900), lastDate: DateTime(2100));
   if (picked != null) {
     model.setChosenDate(DateFormat.yMMMMd('en_US').format(picked.toLocal()));
   }

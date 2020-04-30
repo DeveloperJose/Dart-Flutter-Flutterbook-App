@@ -2,13 +2,14 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:flutterbook/avatar.dart';
+import 'package:flutterbook/image_mixin.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 import 'groceries_dbworker.dart';
 import 'groceries_model.dart';
 
+/// The class in charge of creating and editing grocery information
 class GroceriesEntry extends StatelessWidget with ImageMixin {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 

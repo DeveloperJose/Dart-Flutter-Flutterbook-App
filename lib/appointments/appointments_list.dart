@@ -58,8 +58,7 @@ class AppointmentsList extends StatelessWidget {
         builder: (BuildContext context) {
           return ScopedModel<AppointmentsModel>(
               model: appointmentsModel,
-              child: ScopedModelDescendant<AppointmentsModel>(
-                  builder: (BuildContext context, Widget child, AppointmentsModel model) {
+              child: ScopedModelDescendant<AppointmentsModel>(builder: (BuildContext context, Widget child, AppointmentsModel model) {
                 return Scaffold(
                     body: Container(
                         child: Padding(
@@ -67,9 +66,7 @@ class AppointmentsList extends StatelessWidget {
                             child: GestureDetector(
                                 child: Column(
                               children: <Widget>[
-                                Text(formatDate(date),
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(color: Theme.of(context).accentColor, fontSize: 24)),
+                                Text(formatDate(date), textAlign: TextAlign.center, style: TextStyle(color: Theme.of(context).accentColor, fontSize: 24)),
                                 Divider(),
                                 Expanded(
                                     child: ListView.builder(

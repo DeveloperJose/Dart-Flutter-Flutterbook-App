@@ -6,6 +6,7 @@ import 'groceries_entry.dart';
 import 'groceries_list.dart';
 import 'groceries_model.dart' show GroceriesModel, groceriesModel;
 
+/// The class that provides the grocery views for the main program
 class Groceries extends StatelessWidget {
   Groceries() {
     groceriesModel.loadData(GroceriesDBWorker.db);

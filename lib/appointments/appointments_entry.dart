@@ -87,8 +87,7 @@ class AppointmentsEntry extends StatelessWidget {
                       icon: Icon(Icons.edit),
                       color: Colors.blue,
                       onPressed: () async {
-                        String chosenDate =
-                            await selectDate(context, appointmentsModel, appointmentsModel.entityBeingEdited.date);
+                        String chosenDate = await selectDate(context, appointmentsModel, appointmentsModel.entityBeingEdited.date);
                         if (chosenDate != null) {
                           appointmentsModel.entityBeingEdited.date = chosenDate;
                         }

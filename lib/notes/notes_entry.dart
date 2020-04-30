@@ -27,11 +27,8 @@ class NotesEntry extends StatelessWidget {
       _contentEditingController.text = model.entityBeingEdited?.content;
 
       return Scaffold(
-          bottomNavigationBar:
-              Padding(padding: EdgeInsets.symmetric(vertical: 0, horizontal: 10), child: _buildControlButtons(context, model)),
-          body: Form(
-              key: _formKey,
-              child: ListView(children: [_buildTitleListTile(), _buildContentListTile(), _buildColorListTile(context)])));
+          bottomNavigationBar: Padding(padding: EdgeInsets.symmetric(vertical: 0, horizontal: 10), child: _buildControlButtons(context, model)),
+          body: Form(key: _formKey, child: ListView(children: [_buildTitleListTile(), _buildContentListTile(), _buildColorListTile(context)])));
     });
   }
 
@@ -68,18 +65,14 @@ class NotesEntry extends StatelessWidget {
 
   ListTile _buildColorListTile(BuildContext context) {
     const colors = const ['red', 'green', 'blue', 'yellow', 'grey', 'purple'];
-    return ListTile(
-        leading: Icon(Icons.color_lens),
-        title: Row(children: colors.expand((c) => [_buildColorBox(context, c), Spacer()]).toList()..removeLast()));
+    return ListTile(leading: Icon(Icons.color_lens), title: Row(children: colors.expand((c) => [_buildColorBox(context, c), Spacer()]).toList()..removeLast()));
   }
 
   GestureDetector _buildColorBox(BuildContext context, String color) {
     final Color colorValue = _toColor(color);
     return GestureDetector(
         child: Container(
-            decoration: ShapeDecoration(
-                shape: Border.all(width: 16, color: colorValue) +
-                    Border.all(width: 4, color: notesModel.color == color ? colorValue : Theme.of(context).canvasColor))),
+            decoration: ShapeDecoration(shape: Border.all(width: 16, color: colorValue) + Border.all(width: 4, color: notesModel.color == color ? colorValue : Theme.of(context).canvasColor))),
         onTap: () {
           notesModel.entityBeingEdited.color = color;
           notesModel.setColor(color);

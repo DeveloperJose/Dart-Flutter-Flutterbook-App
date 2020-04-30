@@ -2,33 +2,15 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:flutterbook/avatar.dart';
+import 'package:flutterbook/image_mixin.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 import 'groceries_dbworker.dart';
 import 'groceries_model.dart';
 
+/// The class in charge of managing the list of groceries
 class GroceriesList extends StatelessWidget with ImageMixin {
-  @override
-  Widget build(BuildContext context) {
-    return ScopedModelDescendant<GroceriesModel>(builder: (BuildContext context, Widget child, GroceriesModel model) {
-      return Scaffold(
-        floatingActionButton: buildFloatingActionButton(model),
-        body: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-          model.entityList.length == 0
-              ? Center(child: Text('No groceries added yet!', style: TextStyle(fontSize: 24), textAlign: TextAlign.center))
-              : Expanded(
-                  child: GridView.builder(
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
-                  itemCount: model.entityList.length,
-                  itemBuilder: (BuildContext context, int index) => buildSlidable(context, model, model.entityList[index]),
-                )),
-          RaisedButton(child: Text('Clear All Items'), onPressed: () => GroceriesDBWorker.db.upgradeTable())
-        ]),
-      );
-    });
-  }
-
+  /// Builds the FAB used to add more groceries
   FloatingActionButton buildFloatingActionButton(GroceriesModel model) {
     return FloatingActionButton(
         child: Icon(Icons.add_shopping_cart, color: Colors.white),
@@ -42,38 +24,65 @@ class GroceriesList extends StatelessWidget with ImageMixin {
         });
   }
 
-  Widget buildSlidable(BuildContext context, GroceriesModel model, Grocery item) => Slidable(
+  @override
+  Widget build(BuildContext context) {
+    return ScopedModelDescendant<GroceriesModel>(builder: (BuildContext context, Widget child, GroceriesModel model) {
+      return Scaffold(
+        floatingActionButton: buildFloatingActionButton(model),
+        body: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+          model.entityList.length == 0 ? Center(child: Text('No groceries added yet!', style: TextStyle(fontSize: 24), textAlign: TextAlign.center)) : _buildList(model),
+          RaisedButton(child: Text('Clear All Items'), onPressed: () => GroceriesDBWorker.db.upgradeTable())
+        ]),
+      );
+    });
+  }
+
+  /// Builds the grid listing the groceries
+  Widget _buildList(GroceriesModel model) {
+    return Expanded(
+        child: GridView.builder(
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
+      itemCount: model.entityList.length,
+      itemBuilder: (BuildContext context, int index) => _buildSlideable(context, model, model.entityList[index]),
+    ));
+  }
+
+  /// Builds the slideable widget used to be able to delete the item, wraps the card
+  Widget _buildSlideable(BuildContext context, GroceriesModel model, Grocery item) => Slidable(
         actionPane: SlidableDrawerActionPane(),
         actionExtentRatio: .2,
-        child: buildCard(model, item),
+        child: _buildCard(model, item),
         secondaryActions: [IconSlideAction(caption: "Delete", color: Colors.red, icon: Icons.delete, onTap: () => _deleteGrocery(context, item))],
       );
 
-  Widget buildCard(GroceriesModel model, Grocery item) {
+  /// Builds an individual item's card
+  Widget _buildCard(GroceriesModel model, Grocery item) {
+    // Sort so we can show prices in order
     item.sortDetailsByPrice();
-    File avatarFile = File(imageFilenameFromString(item.name));
-    bool avatarFileExists = avatarFile.existsSync();
+    // Attempt to load the grocery image
+    File imageFile = File(imageFilenameFromString(item.name));
+    bool imageFileExists = imageFile.existsSync();
     return GestureDetector(
       onTap: () => _editGrocery(model, item),
       child: Card(
         elevation: 8,
         child: Container(
-          decoration: BoxDecoration(
-              image: DecorationImage(
-            image: FileImage(avatarFile),
-            fit: BoxFit.fitWidth,
-            colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.2), BlendMode.dstATop),
-          )),
+          decoration: imageFileExists ? _buildImageContainer(imageFile) : null,
           child: Column(children: [
             Text(item.name, style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.indigo)),
-            Expanded(child: Scrollbar(child: buildListView(item))),
+            Expanded(child: Scrollbar(child: _buildItemDetails(item))),
           ]),
         ),
       ),
     );
   }
 
-  ListView buildListView(Grocery item) {
+  /// Builds the container used for the image, sets the opacity of the image to 20% as well
+  BoxDecoration _buildImageContainer(File imageFile) =>
+      BoxDecoration(image: DecorationImage(image: FileImage(imageFile), fit: BoxFit.fitWidth, colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.2), BlendMode.dstATop)));
+
+  /// Builds the item details presented in the card for each grocery
+  ListView _buildItemDetails(Grocery item) {
     return ListView.builder(
         itemCount: item.details.length,
         itemBuilder: (BuildContext context, int index) {
@@ -84,6 +93,7 @@ class GroceriesList extends StatelessWidget with ImageMixin {
         });
   }
 
+  /// Fetches previously filled in information and allows for grocery info editing
   void _editGrocery(GroceriesModel model, Grocery grocery) async {
     File tempFile = imageTempFile();
     if (tempFile.existsSync()) tempFile.deleteSync();
@@ -92,6 +102,7 @@ class GroceriesList extends StatelessWidget with ImageMixin {
     groceriesModel.setStackIndex(1);
   }
 
+  /// Deletes a grocery from the list
   Future _deleteGrocery(BuildContext context, Grocery grocery) {
     return showDialog(
         context: context,

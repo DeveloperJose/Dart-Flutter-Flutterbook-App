@@ -57,8 +57,7 @@ class TasksList extends StatelessWidget {
                                 ? null
                                 : Text(dueDate,
                                     style: task.completed
-                                        ? TextStyle(
-                                            color: Theme.of(context).disabledColor, decoration: TextDecoration.lineThrough)
+                                        ? TextStyle(color: Theme.of(context).disabledColor, decoration: TextDecoration.lineThrough)
                                         : TextStyle(color: Theme.of(context).textTheme.title.color)),
                             onTap: () async {
                               if (task.completed) {

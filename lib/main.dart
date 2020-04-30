@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'appointments/appointments.dart';
-import 'avatar.dart';
 import 'contacts/contacts.dart';
+import 'groceries/groceries.dart';
+import 'image_mixin.dart';
 import 'notes/notes.dart';
 import 'tasks/tasks.dart';
-import 'groceries/groceries.dart';
 
 void main() {
   startMeUp() async {

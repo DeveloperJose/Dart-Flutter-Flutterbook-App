@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:scoped_model/scoped_model.dart';
 
+import '../image_mixin.dart';
 import '../utils.dart' as utils;
-import '../avatar.dart';
 import 'contacts_dbworker.dart';
 import 'contacts_model.dart' show Contact, ContactsModel, contactsModel;
 

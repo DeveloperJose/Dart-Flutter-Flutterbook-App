@@ -31,7 +31,7 @@ class GroceriesList extends StatelessWidget with ImageMixin {
         floatingActionButton: buildFloatingActionButton(model),
         body: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
           model.entityList.length == 0 ? Center(child: Text('No groceries added yet!', style: TextStyle(fontSize: 24), textAlign: TextAlign.center)) : _buildList(model),
-          RaisedButton(child: Text('Clear All Items'), onPressed: () => GroceriesDBWorker.db.upgradeTable())
+//          RaisedButton(child: Text('Clear All Items'), onPressed: () => GroceriesDBWorker.db.upgradeTable())
         ]),
       );
     });

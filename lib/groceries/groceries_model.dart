@@ -17,10 +17,10 @@ class Grocery {
   void sortDetailsByPrice() => details.sort((item1, item2) => (item1.price - item2.price).toInt());
 
   /// Combines all the store names into one for database storage
-  String getStoreNames() => details.map((detail) => detail.storeName).join(',');
+  String getStoreNames() => details.map((detail) => detail.storeName).join('|');
 
   /// Combines all the store prices into one for database storage
-  String getPrices() => details.map((detail) => detail.price).join(', ');
+  String getPrices() => details.map((detail) => detail.price).join('|');
 
   /// String representation of a grocery, mostly used for debugging
   String toString() => "{ id=$id, name=$name, details=${details.join(',')} }";

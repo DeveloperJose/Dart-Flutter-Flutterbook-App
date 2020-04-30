@@ -108,7 +108,7 @@ class GroceriesEntry extends StatelessWidget with ImageMixin {
           middleNumberWidth: 125,
           middleNumberStyle: TextStyle(fontSize: 21),
           middleNumberBackground: Colors.yellowAccent.withOpacity(0.5),
-          spinnerValue: model.details[index].price,
+          spinnerValue: model?.details[index]?.price ?? 0,
           onChange: (newValue) {
             model.details[index].price = newValue;
             model.triggerRebuild();

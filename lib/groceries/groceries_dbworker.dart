@@ -1,12 +1,113 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:sqflite/sqflite.dart';
 
 import 'groceries_model.dart';
 
-/// The class in charge of all grocery database operations
-class GroceriesDBWorker {
+abstract class GroceriesDBWorker {
   /// The database in charge of managing grocery information
-  static final GroceriesDBWorker db = GroceriesDBWorker._();
+  static final GroceriesDBWorker db = GroceriesFirebaseDB._();
 
+  /// Create and add the given grocery in this database.
+  Future<int> create(Grocery grocery);
+
+  /// Update the given grocery of this database.
+  Future<int> update(Grocery grocery);
+
+  /// Delete the specified grocery.
+  Future<void> delete(int id);
+
+  /// Return the specified grocery, or null.
+  Future<Grocery> get(int id);
+
+  /// Return all the grocery of this database.
+  Future<List<Grocery>> getAll();
+}
+
+class GroceriesFirebaseDB implements GroceriesDBWorker {
+  var db = FirebaseDatabase.instance.reference();
+
+  GroceriesFirebaseDB._() {
+    FirebaseDatabase.instance.reference().child('groceries').child('0').set({'name': 'avocado', 'storeNames': 'Walmart|Sams', 'storePrices': '1.00|2.00'});
+    FirebaseDatabase.instance.reference().child('groceries').child('1').set({'name': 'orange', 'storeNames': 'Walmart|Sams', 'storePrices': '1.00|2.00'});
+    FirebaseDatabase.instance.reference().child('groceries').child('2').set({'name': 'apple', 'storeNames': 'Walmart|Sams', 'storePrices': '1.00|2.00'});
+    FirebaseDatabase.instance.reference().child('groceries').child('3').set({'name': 'avocado', 'storeNames': 'Walmart|Sams', 'storePrices': '1.00|2.00'});
+  }
+
+  @override
+  Future<int> create(Grocery grocery) async {
+    return db.child('groceries').once().then((DataSnapshot dataSnapshot) {
+      if (grocery.id == null) {
+        int newKey = dataSnapshot.value.length;
+        grocery.id = newKey;
+      }
+      update(grocery);
+      return grocery.id;
+    });
+  }
+
+  @override
+  Future<void> delete(int id) async {
+    db.child('groceries').child(id.toString()).remove();
+  }
+
+  @override
+  Future<Grocery> get(int id) async {
+    return db.child('groceries').child(id.toString()).once().then((DataSnapshot dataSnapshot) {
+      return Grocery()
+        ..id = id
+        ..name = dataSnapshot.value['name']
+        ..details = _detailsFromJSON(dataSnapshot.value);
+    });
+  }
+
+  @override
+  Future<List<Grocery>> getAll() async {
+    return db.child('groceries').once().then((DataSnapshot dataSnapshot) {
+      print('Getall: Length: ${dataSnapshot.value.length}. Value: ${dataSnapshot.value}');
+      if (dataSnapshot.value.length == 0) return [];
+      var result = List<Grocery>();
+      for (int i = 0; i < dataSnapshot.value.length; i++) {
+        var current = dataSnapshot.value[i];
+        if (current == null) continue;
+        result.add(Grocery()
+          ..id = i
+          ..name = current['name'] ?? ''
+          ..details = _detailsFromJSON(current));
+
+        print('Added grocery: id=$i, name=${current['name']}');
+      }
+      return result;
+    });
+  }
+
+  @override
+  Future<int> update(Grocery grocery) async {
+    db.child('groceries').child(grocery.id.toString()).update({'name': grocery.name, 'storeNames': grocery.getStoreNames(), 'storePrices': grocery.getPrices()});
+    return grocery.id;
+  }
+
+  List<ItemDetail> _detailsFromJSON(var json) {
+    // Attempt to load the details
+    String storeNames = json['storeNames'];
+    String storePrices = json['storePrices'];
+
+    if (storeNames.isEmpty || storePrices.isEmpty) return [];
+
+    List<String> nameSplit = storeNames.split('|');
+    List<String> priceSplit = storePrices.split('|');
+
+    List<ItemDetail> itemDetails = [];
+    for (int i = 0; i < nameSplit.length; i++) {
+      String name = nameSplit[i];
+      double num = double.tryParse(priceSplit[i]);
+      itemDetails.add(ItemDetail(storeName: name ?? 'Invalid DB Entry', price: num ?? -1));
+    }
+    return itemDetails;
+  }
+}
+
+/// The class in charge of all grocery database operations
+class GroceriesSQFLiteDB implements GroceriesDBWorker {
   /// The name used for this database
   static const String DB_NAME = 'groceries.db';
 
@@ -27,7 +128,7 @@ class GroceriesDBWorker {
 
   Database _db;
 
-  GroceriesDBWorker._();
+  GroceriesSQFLiteDB._();
 
   Future<Database> get database async => _db ??= await _init();
 
@@ -99,8 +200,8 @@ class GroceriesDBWorker {
 
     if (storeNames.isEmpty || storePrices.isEmpty) return [];
 
-    List<String> nameSplit = storeNames.split(',');
-    List<String> priceSplit = storePrices.split(',');
+    List<String> nameSplit = storeNames.split('|');
+    List<String> priceSplit = storePrices.split('|');
 
     List<ItemDetail> itemDetails = [];
     for (int i = 0; i < nameSplit.length; i++) {

@@ -14,10 +14,26 @@ class GroceriesList extends StatelessWidget {
         });
   }
 
-  Widget buildItem(Grocery item) {
+  Widget buildCard(GroceriesModel model, Grocery item) {
+    item.details.sort((item1, item2) => (item1.price - item2.price).toInt());
     return Card(
-      child: Text(item.toString()),
-    );
+        elevation: 8,
+        child: Column(children: [
+          CircleAvatar(backgroundColor: Colors.indigoAccent, foregroundColor: Colors.white, child: Text(item.name.substring(0, 2).toUpperCase())),
+          Text(item.name),
+          Expanded(child: Scrollbar(child: buildListView(item)))
+        ]));
+  }
+
+  ListView buildListView(Grocery item) {
+    return ListView.builder(
+        itemCount: item.details.length,
+        itemBuilder: (BuildContext context, int index) {
+          var itemDetail = item.details[index];
+          var leadingWidget = Text((index + 1).toString(), style: TextStyle(fontSize: 30), textAlign: TextAlign.center);
+          var trailingWidget = (index == 0) ? Icon(Icons.star) : Text('');
+          return ListTile(leading: leadingWidget, title: Text(itemDetail.storeName), subtitle: Text('\$${itemDetail.price.toStringAsFixed(2)}'), trailing: trailingWidget);
+        });
   }
 
   @override
@@ -29,11 +45,11 @@ class GroceriesList extends StatelessWidget {
           model.entityList.length == 0
               ? Center(child: Text('No groceries added yet!', style: TextStyle(fontSize: 24), textAlign: TextAlign.center))
               : Expanded(
-                  child: ListView.builder(
+                  child: GridView.builder(
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
                   itemCount: model.entityList.length,
-                  itemBuilder: (BuildContext context, int index) => buildItem(model.entityList[index]),
+                  itemBuilder: (BuildContext context, int index) => buildCard(model, model.entityList[index]),
                 )),
-          // Debugging database button
           RaisedButton(child: Text('Renew DB'), onPressed: () => GroceriesDBWorker.db.upgradeTable())
         ]),
       );

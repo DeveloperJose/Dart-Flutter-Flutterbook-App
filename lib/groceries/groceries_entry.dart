@@ -12,6 +12,9 @@ class GroceriesEntry extends StatelessWidget {
     return ScopedModel<GroceriesModel>(
         model: groceriesModel,
         child: ScopedModelDescendant<GroceriesModel>(builder: (BuildContext context, Widget child, GroceriesModel model) {
+          // Force users to select at least one store
+          if (model.details.isEmpty) model.details.add(ItemDetail());
+
           return Scaffold(
               bottomNavigationBar: buildBottomNavigationBar(context, model),
               body: Form(
@@ -19,8 +22,8 @@ class GroceriesEntry extends StatelessWidget {
                   child: Column(children: [
                     buildItemNameListTile(model),
                     buildImageListTile(),
-                    buildAddPriceButton(model),
                     buildPriceList(model),
+                    buildAddPriceButton(model),
                   ])));
         }));
   }
@@ -39,7 +42,7 @@ class GroceriesEntry extends StatelessWidget {
   ListTile buildImageListTile() => ListTile(leading: Icon(Icons.photo), title: Text('Grocery image not set...'), trailing: IconButton(icon: Icon(Icons.edit)));
 
   RaisedButton buildAddPriceButton(GroceriesModel model) =>
-      RaisedButton(child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [Icon(Icons.add), Text('Add Price')]), onPressed: () => model.addDetail(ItemDetail()));
+      RaisedButton(child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [Icon(Icons.add), Text('Add Another Store and Price')]), onPressed: () => model.addDetail(ItemDetail()));
 
   Expanded buildPriceList(GroceriesModel model) =>
       Expanded(child: Scrollbar(child: ListView.builder(itemCount: model.details.length, itemBuilder: (BuildContext context, int index) => buildPriceCard(model, index))));
@@ -88,7 +91,8 @@ class GroceriesEntry extends StatelessWidget {
 
   TextEditingController buildStorePriceController(GroceriesModel model, int index) {
     var itemDetail = model.details[index];
-    var controller = TextEditingController(text: itemDetail.price ?? "");
+    var price = itemDetail.price == null ? "" : itemDetail.price.toString();
+    var controller = TextEditingController(text: price);
     controller.addListener(() => itemDetail.price = double.tryParse(controller.text));
     return controller;
   }
@@ -115,8 +119,9 @@ class GroceriesEntry extends StatelessWidget {
             id = await GroceriesDBWorker.db.update(groceriesModel.entityBeingEdited);
           }
           groceriesModel.loadData(GroceriesDBWorker.db);
+
           // Clear and go back to list
-          model.clear();
+          model.details = [];
           model.setStackIndex(0);
           Scaffold.of(context).showSnackBar(SnackBar(backgroundColor: Colors.green, duration: Duration(seconds: 2), content: Text('Grocery item saved!')));
         },
@@ -126,7 +131,7 @@ class GroceriesEntry extends StatelessWidget {
         child: Text('Cancel'),
         onPressed: () {
           FocusScope.of(context).requestFocus(FocusNode());
-          model.clear();
+          model.details = [];
           model.setStackIndex(0);
         },
       );

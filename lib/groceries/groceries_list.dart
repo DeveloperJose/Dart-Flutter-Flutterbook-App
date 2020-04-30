@@ -40,19 +40,27 @@ class GroceriesList extends StatelessWidget with ImageMixin {
   /// Builds the grid listing the groceries
   Widget _buildList(GroceriesModel model) {
     return Expanded(
-        child: GridView.builder(
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
-      itemCount: model.entityList.length,
-      itemBuilder: (BuildContext context, int index) => _buildSlideable(context, model, model.entityList[index]),
-    ));
+      child: GridView.builder(
+        physics: ScrollPhysics(),
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, mainAxisSpacing: 45, crossAxisSpacing: 0, childAspectRatio: 1.3),
+        itemCount: model.entityList.length,
+        itemBuilder: (BuildContext context, int index) => _buildSlideable(context, model, model.entityList[index]),
+      ),
+    );
   }
 
   /// Builds the slideable widget used to be able to delete the item, wraps the card
-  Widget _buildSlideable(BuildContext context, GroceriesModel model, Grocery item) => Slidable(
-        actionPane: SlidableDrawerActionPane(),
-        actionExtentRatio: .2,
-        child: _buildCard(model, item),
-        secondaryActions: [IconSlideAction(caption: "Delete", color: Colors.red, icon: Icons.delete, onTap: () => _deleteGrocery(context, item))],
+  Widget _buildSlideable(BuildContext context, GroceriesModel model, Grocery item) => Container(
+        height: 20,
+        child: Slidable(
+          actionPane: SlidableDrawerActionPane(),
+          actionExtentRatio: .2,
+          child: _buildCard(model, item),
+          secondaryActions: [
+            IconSlideAction(caption: "Delete", color: Colors.red, icon: Icons.delete, onTap: () => _deleteGrocery(context, item)),
+            IconSlideAction(caption: 'Edit', color: Colors.blue, icon: Icons.edit, onTap: () => _editGrocery(model, item))
+          ],
+        ),
       );
 
   /// Builds an individual item's card
@@ -62,8 +70,8 @@ class GroceriesList extends StatelessWidget with ImageMixin {
     // Attempt to load the grocery image
     File imageFile = File(imageFilenameFromString(item.name));
     bool imageFileExists = imageFile.existsSync();
-    return GestureDetector(
-      onTap: () => _editGrocery(model, item),
+    return Container(
+      padding: EdgeInsets.all(2),
       child: Card(
         elevation: 8,
         child: Container(
@@ -71,6 +79,7 @@ class GroceriesList extends StatelessWidget with ImageMixin {
           child: Column(children: [
             Text(item.name, style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.indigo)),
             Expanded(child: Scrollbar(child: _buildItemDetails(item))),
+//          ListTile(dense: false, trailing: item.details.length >= 2 ? Icon(Icons.arrow_downward, size: 10) : Text(''))
           ]),
         ),
       ),
@@ -89,7 +98,12 @@ class GroceriesList extends StatelessWidget with ImageMixin {
           var itemDetail = item.details[index];
           var leadingWidget = Text((index + 1).toString(), style: TextStyle(fontSize: 30), textAlign: TextAlign.center);
           var trailingWidget = (index == 0) ? Icon(Icons.star) : Text('');
-          return ListTile(leading: leadingWidget, title: Text(itemDetail.storeName), subtitle: Text('\$${itemDetail.price.toStringAsFixed(2)}'), trailing: trailingWidget);
+          return ListTile(
+              contentPadding: EdgeInsets.all(2),
+              leading: leadingWidget,
+              title: Text(itemDetail?.storeName, style: TextStyle(fontSize: 25)),
+              subtitle: Text('\$${itemDetail?.price?.toStringAsFixed(2)}'),
+              trailing: trailingWidget);
         });
   }
 

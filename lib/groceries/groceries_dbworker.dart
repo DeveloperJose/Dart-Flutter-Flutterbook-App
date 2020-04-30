@@ -38,7 +38,7 @@ class GroceriesFirebaseDB implements GroceriesDBWorker {
   Future<int> create(Grocery grocery) {
     return db.child('groceries').once().then((DataSnapshot dataSnapshot) {
       if (grocery.id == null) {
-        int newKey = dataSnapshot.value.length;
+        int newKey = dataSnapshot.value?.length ?? 0;
         grocery.id = newKey;
       }
       update(grocery);

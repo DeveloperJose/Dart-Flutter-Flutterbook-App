@@ -6,11 +6,11 @@ import 'package:image_picker/image_picker.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 import '../utils.dart' as utils;
-import 'avatar.dart';
+import '../avatar.dart';
 import 'contacts_dbworker.dart';
 import 'contacts_model.dart';
 
-class ContactsEntry extends StatelessWidget with Avatar {
+class ContactsEntry extends StatelessWidget with ImageMixin {
   final TextEditingController _nameEditingController = TextEditingController();
   final TextEditingController _phoneEditingController = TextEditingController();
   final TextEditingController _emailEditingController = TextEditingController();
@@ -42,10 +42,10 @@ class ContactsEntry extends StatelessWidget with Avatar {
           _emailEditingController.text = model.entityBeingEdited.email;
         }
 
-        File avatarFile = avatarTempFile();
+        File avatarFile = imageTempFile();
         if (!avatarFile.existsSync()) {
           if (model.entityBeingEdited != null && model.entityBeingEdited.id != null) {
-            avatarFile = File(avatarFileName(model.entityBeingEdited.id));
+            avatarFile = File(imageFilenameFromID(model.entityBeingEdited.id));
           }
         }
 
@@ -56,7 +56,7 @@ class ContactsEntry extends StatelessWidget with Avatar {
                   FlatButton(
                     child: Text('Cancel'),
                     onPressed: () {
-                      File avatarFile = avatarTempFile();
+                      File avatarFile = imageTempFile();
                       if (avatarFile.existsSync()) {
                         avatarFile.deleteSync();
                       }
@@ -147,7 +147,7 @@ class ContactsEntry extends StatelessWidget with Avatar {
                     onTap: () async {
                       var cameraImage = await ImagePicker.pickImage(source: ImageSource.camera);
                       if (cameraImage != null) {
-                        cameraImage.copySync(avatarTempFileName());
+                        cameraImage.copySync(imageTempFilename());
                         contactsModel.triggerRebuild();
                       }
                       Navigator.of(dialogContext).pop();
@@ -158,7 +158,7 @@ class ContactsEntry extends StatelessWidget with Avatar {
                   onTap: () async {
                     var galleryImage = await ImagePicker.pickImage(source: ImageSource.gallery);
                     if (galleryImage != null) {
-                      galleryImage.copySync(avatarTempFileName());
+                      galleryImage.copySync(imageTempFilename());
                       imageCache.clear();
                       contactsModel.triggerRebuild();
                     }
@@ -181,9 +181,9 @@ class ContactsEntry extends StatelessWidget with Avatar {
     } else {
       id = await ContactsDBWorker.db.update(contactsModel.entityBeingEdited);
     }
-    File avatarFile = avatarTempFile();
+    File avatarFile = imageTempFile();
     if (avatarFile.existsSync()) {
-      File f = avatarFile.renameSync(avatarFileName(id));
+      File f = avatarFile.renameSync(imageFilenameFromID(id));
 
       // FIXME: force to reload the avartar in the ContactsList
     }

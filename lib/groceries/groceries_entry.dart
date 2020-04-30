@@ -1,10 +1,15 @@
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
+import 'package:flutterbook/avatar.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 import 'groceries_dbworker.dart';
 import 'groceries_model.dart';
 
-class GroceriesEntry extends StatelessWidget {
+class GroceriesEntry extends StatelessWidget with ImageMixin {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
@@ -15,13 +20,24 @@ class GroceriesEntry extends StatelessWidget {
           // Force users to select at least one store
           if (model.details.isEmpty) model.details.add(ItemDetail());
 
+          File avatarFile = imageTempFile();
+          if (!avatarFile.existsSync()) {
+            if (model.entityBeingEdited != null && model.entityBeingEdited.id != null) {
+              avatarFile = File(imageFilenameFromString(model.entityBeingEdited.name));
+            }
+          }
+
+          if (model.entityBeingEdited != null){
+            model.details = model.entityBeingEdited.details;
+          }
+
           return Scaffold(
               bottomNavigationBar: buildBottomNavigationBar(context, model),
               body: Form(
                   key: _formKey,
                   child: Column(children: [
                     buildItemNameListTile(model),
-                    buildImageListTile(),
+                    buildImageListTile(context, avatarFile),
                     buildPriceList(model),
                     buildAddPriceButton(model),
                   ])));
@@ -39,7 +55,19 @@ class GroceriesEntry extends StatelessWidget {
         },
       ));
 
-  ListTile buildImageListTile() => ListTile(leading: Icon(Icons.photo), title: Text('Grocery image not set...'), trailing: IconButton(icon: Icon(Icons.edit)));
+  ListTile buildImageListTile(BuildContext context, File avatarFile) => ListTile(
+      title: avatarFile.existsSync()
+          ?
+          //Image.file(avatarFile)
+          Image.memory(
+              Uint8List.fromList(avatarFile.readAsBytesSync()),
+              alignment: Alignment.center,
+              height: 100,
+              width: 100,
+              fit: BoxFit.contain,
+            )
+          : Text("No grocery image for this item"),
+      trailing: IconButton(icon: Icon(Icons.edit), color: Colors.blue, onPressed: () => _selectAvatar(context)));
 
   RaisedButton buildAddPriceButton(GroceriesModel model) =>
       RaisedButton(child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [Icon(Icons.add), Text('Add Another Store and Price')]), onPressed: () => model.addDetail(ItemDetail()));
@@ -118,6 +146,11 @@ class GroceriesEntry extends StatelessWidget {
           } else {
             id = await GroceriesDBWorker.db.update(groceriesModel.entityBeingEdited);
           }
+          File avatarFile = imageTempFile();
+          if (avatarFile.existsSync()) {
+            File f = avatarFile.renameSync(imageFilenameFromString(groceriesModel.entityBeingEdited.name));
+            model.triggerRebuild();
+          }
           groceriesModel.loadData(GroceriesDBWorker.db);
 
           // Clear and go back to list
@@ -135,4 +168,39 @@ class GroceriesEntry extends StatelessWidget {
           model.setStackIndex(0);
         },
       );
+
+  Future _selectAvatar(BuildContext context) {
+    return showDialog(
+        context: context,
+        builder: (BuildContext dialogContext) {
+          return AlertDialog(
+            content: SingleChildScrollView(
+              child: ListBody(children: <Widget>[
+                GestureDetector(
+                    child: ListTile(leading: Icon(Icons.camera_alt), title: Text("Take a picture", style: TextStyle(fontSize: 20))),
+                    onTap: () async {
+                      var cameraImage = await ImagePicker.pickImage(source: ImageSource.camera);
+                      if (cameraImage != null) {
+                        cameraImage.copySync(imageTempFilename());
+                        groceriesModel.triggerRebuild();
+                      }
+                      Navigator.of(dialogContext).pop();
+                    }),
+                Divider(),
+                GestureDetector(
+                    child: ListTile(leading: Icon(Icons.photo), title: Text("Select from your gallery", style: TextStyle(fontSize: 20))),
+                    onTap: () async {
+                      var galleryImage = await ImagePicker.pickImage(source: ImageSource.gallery);
+                      if (galleryImage != null) {
+                        galleryImage.copySync(imageTempFilename());
+                        imageCache.clear();
+                        groceriesModel.triggerRebuild();
+                      }
+                      Navigator.of(dialogContext).pop();
+                    }),
+              ]),
+            ),
+          );
+        });
+  }
 }

@@ -5,11 +5,11 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 import '../utils.dart' as utils;
-import 'avatar.dart';
+import '../avatar.dart';
 import 'contacts_dbworker.dart';
 import 'contacts_model.dart' show Contact, ContactsModel, contactsModel;
 
-class ContactsList extends StatelessWidget with Avatar {
+class ContactsList extends StatelessWidget with ImageMixin {
   @override
   Widget build(BuildContext context) {
     return ScopedModel<ContactsModel>(
@@ -19,7 +19,7 @@ class ContactsList extends StatelessWidget with Avatar {
               floatingActionButton: FloatingActionButton(
                   child: Icon(Icons.add, color: Colors.white),
                   onPressed: () async {
-                    File avatarFile = avatarTempFile();
+                    File avatarFile = imageTempFile();
                     if (avatarFile.existsSync()) {
                       avatarFile.deleteSync();
                     }
@@ -31,7 +31,7 @@ class ContactsList extends StatelessWidget with Avatar {
                   itemCount: contactsModel.entityList.length,
                   itemBuilder: (BuildContext context, int index) {
                     Contact contact = contactsModel.entityList[index];
-                    File avatarFile = File(avatarFileName(contact.id));
+                    File avatarFile = File(imageFilenameFromID(contact.id));
                     bool avatarFileExists = avatarFile.existsSync();
                     return Column(children: <Widget>[
                       Slidable(
@@ -46,7 +46,7 @@ class ContactsList extends StatelessWidget with Avatar {
                             title: Text("${contact.name}"),
                             subtitle: contact.phone == null ? null : Text("${contact.phone}"),
                             onTap: () async {
-                              File avatarFile = avatarTempFile();
+                              File avatarFile = imageTempFile();
                               if (avatarFile.existsSync()) {
                                 avatarFile.deleteSync();
                               }

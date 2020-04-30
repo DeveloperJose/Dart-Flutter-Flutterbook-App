@@ -18,31 +18,24 @@ class Grocery {
   String name;
   List<ItemDetail> details = [];
 
+  void sortDetailsByPrice() => details.sort((item1, item2) => (item1.price - item2.price).toInt());
+
   String getStoreNames() => details.map((detail) => detail.storeName).join(',');
 
   String getPrices() => details.map((detail) => detail.price).join(', ');
 
   String toString() => "{ id=$id, name=$name, details=${details.join(',')} }";
-
-  ItemDetail getBestDeal() => details.reduce((prev, next) => prev.price < next.price ? prev : next);
-
-  List<ItemDetail> getRestWithoutBest() {
-    ItemDetail bestDeal = getBestDeal();
-    return details.where((elem) => elem.price != bestDeal.price).toList();
-  }
 }
 
 class GroceriesModel extends BaseModel<Grocery> {
   List<ItemDetail> details = [];
-  bool isExpanded = false;
 
   void addDetail(ItemDetail detail) {
     details.add(detail);
     notifyListeners();
   }
 
-  void setExpanded(bool val){
-    isExpanded = val;
+  void triggerRebuild() {
     notifyListeners();
   }
 

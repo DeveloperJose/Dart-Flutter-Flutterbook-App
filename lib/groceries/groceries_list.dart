@@ -23,7 +23,7 @@ class GroceriesList extends StatelessWidget with ImageMixin {
                   itemCount: model.entityList.length,
                   itemBuilder: (BuildContext context, int index) => buildSlidable(context, model, model.entityList[index]),
                 )),
-          RaisedButton(child: Text('Renew DB'), onPressed: () => GroceriesDBWorker.db.upgradeTable())
+          RaisedButton(child: Text('Clear All Items'), onPressed: () => GroceriesDBWorker.db.upgradeTable())
         ]),
       );
     });
@@ -44,7 +44,7 @@ class GroceriesList extends StatelessWidget with ImageMixin {
 
   Widget buildSlidable(BuildContext context, GroceriesModel model, Grocery item) => Slidable(
         actionPane: SlidableDrawerActionPane(),
-        actionExtentRatio: .25,
+        actionExtentRatio: .2,
         child: buildCard(model, item),
         secondaryActions: [IconSlideAction(caption: "Delete", color: Colors.red, icon: Icons.delete, onTap: () => _deleteGrocery(context, item))],
       );
@@ -54,18 +54,23 @@ class GroceriesList extends StatelessWidget with ImageMixin {
     File avatarFile = File(imageFilenameFromString(item.name));
     bool avatarFileExists = avatarFile.existsSync();
     return GestureDetector(
-        onTap: () => _editGrocery(model, item),
-        child: Card(
-            elevation: 8,
-            child: Column(children: [
-              CircleAvatar(
-                  backgroundColor: Colors.indigoAccent,
-                  foregroundColor: Colors.white,
-                  backgroundImage: avatarFileExists ? FileImage(avatarFile) : null,
-                  child: avatarFileExists ? null : Text(item.name.substring(0, 2).toUpperCase())),
-              Text(item.name),
-              Expanded(child: Scrollbar(child: buildListView(item))),
-            ])));
+      onTap: () => _editGrocery(model, item),
+      child: Card(
+        elevation: 8,
+        child: Container(
+          decoration: BoxDecoration(
+              image: DecorationImage(
+            image: FileImage(avatarFile),
+            fit: BoxFit.fitWidth,
+            colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.2), BlendMode.dstATop),
+          )),
+          child: Column(children: [
+            Text(item.name, style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.indigo)),
+            Expanded(child: Scrollbar(child: buildListView(item))),
+          ]),
+        ),
+      ),
+    );
   }
 
   ListView buildListView(Grocery item) {

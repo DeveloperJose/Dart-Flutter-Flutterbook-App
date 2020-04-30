@@ -6,6 +6,7 @@ import 'contacts/avatar.dart';
 import 'contacts/contacts.dart';
 import 'notes/notes.dart';
 import 'tasks/tasks.dart';
+import 'groceries/groceries.dart';
 
 void main() {
   startMeUp() async {
@@ -27,7 +28,7 @@ class FlutterBook extends StatelessWidget {
           primarySwatch: Colors.blue,
         ),
         home: DefaultTabController(
-            length: 4,
+            length: 5,
             child: Scaffold(
                 appBar: AppBar(
                     title: Text('FlutterBook by Jose G. Perez'),
@@ -36,12 +37,14 @@ class FlutterBook extends StatelessWidget {
                       Tab(icon: Icon(Icons.contacts), text: 'Contacts'),
                       Tab(icon: Icon(Icons.note), text: 'Notes'),
                       Tab(icon: Icon(Icons.assignment_turned_in), text: 'Tasks'),
+                      Tab(icon: Icon(Icons.local_grocery_store), text: 'Groceries'),
                     ])),
                 body: TabBarView(children: [
                   Appointments(),
                   Contacts(),
                   Notes(),
                   Tasks(),
+                  Groceries(),
                 ]))));
   }
 }

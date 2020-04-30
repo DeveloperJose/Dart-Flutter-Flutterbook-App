@@ -99,7 +99,7 @@ class GroceriesEntry extends StatelessWidget with ImageMixin {
   ListTile _buildStorePriceEditor(GroceriesModel model, int index) => ListTile(
         leading: Icon(Icons.attach_money),
         title: SpinnerInput(
-          minValue: 0,
+          minValue: 0.01,
           maxValue: double.maxFinite,
           fractionDigits: 2,
           step: 1,
@@ -168,11 +168,10 @@ class GroceriesEntry extends StatelessWidget with ImageMixin {
           print('Model: ${groceriesModel.toString()}');
 
           // Database updating
-          int id = 0;
           if (model.entityBeingEdited.id == null) {
-            id = await GroceriesDBWorker.db.create(groceriesModel.entityBeingEdited);
+            await GroceriesDBWorker.db.create(groceriesModel.entityBeingEdited);
           } else {
-            id = await GroceriesDBWorker.db.update(groceriesModel.entityBeingEdited);
+            await GroceriesDBWorker.db.update(groceriesModel.entityBeingEdited);
           }
           File avatarFile = imageTempFile();
           if (avatarFile.existsSync()) {

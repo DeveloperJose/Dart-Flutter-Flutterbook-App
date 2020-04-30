@@ -51,7 +51,7 @@ class GroceriesModel extends BaseModel<Grocery> {
     notifyListeners();
   }
 
-  void removeDetail(int index){
+  void removeDetail(int index) {
     details.removeAt(index);
     notifyListeners();
   }

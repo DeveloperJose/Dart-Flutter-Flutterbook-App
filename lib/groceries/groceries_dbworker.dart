@@ -11,7 +11,7 @@ abstract class GroceriesDBWorker {
   Future<int> create(Grocery grocery);
 
   /// Update the given grocery of this database.
-  Future<int> update(Grocery grocery);
+  Future<void> update(Grocery grocery);
 
   /// Delete the specified grocery.
   Future<void> delete(int id);
@@ -27,14 +27,15 @@ class GroceriesFirebaseDB implements GroceriesDBWorker {
   var db = FirebaseDatabase.instance.reference();
 
   GroceriesFirebaseDB._() {
-    FirebaseDatabase.instance.reference().child('groceries').child('0').set({'name': 'avocado', 'storeNames': 'Walmart|Sams', 'storePrices': '1.00|2.00'});
-    FirebaseDatabase.instance.reference().child('groceries').child('1').set({'name': 'orange', 'storeNames': 'Walmart|Sams', 'storePrices': '1.00|2.00'});
-    FirebaseDatabase.instance.reference().child('groceries').child('2').set({'name': 'apple', 'storeNames': 'Walmart|Sams', 'storePrices': '1.00|2.00'});
-    FirebaseDatabase.instance.reference().child('groceries').child('3').set({'name': 'avocado', 'storeNames': 'Walmart|Sams', 'storePrices': '1.00|2.00'});
+//    FirebaseDatabase.instance.reference().child('groceries').child('0').set({'name': 'Hibiscus', 'storeNames': 'Walmart|Sams', 'storePrices': '1.00|2.00'});
+//    FirebaseDatabase.instance.reference().child('groceries').child('1').set({'name': 'Pear', 'storeNames': 'Walmart|Sams', 'storePrices': '1.00|2.00'});
+//    FirebaseDatabase.instance.reference().child('groceries').child('2').set({'name': 'Tomato', 'storeNames': 'Walmart|Sams', 'storePrices': '1.00|2.00'});
+//    FirebaseDatabase.instance.reference().child('groceries').child('3').set({'name': 'Tomato Juice', 'storeNames': 'Walmart|Sams', 'storePrices': '1.00|2.00'});
+//    FirebaseDatabase.instance.reference().child('groceries').child('3').set({'name': 'Pineapple', 'storeNames': 'Walmart|Sams', 'storePrices': '1.00|2.00'});
   }
 
   @override
-  Future<int> create(Grocery grocery) async {
+  Future<int> create(Grocery grocery) {
     return db.child('groceries').once().then((DataSnapshot dataSnapshot) {
       if (grocery.id == null) {
         int newKey = dataSnapshot.value.length;
@@ -46,12 +47,12 @@ class GroceriesFirebaseDB implements GroceriesDBWorker {
   }
 
   @override
-  Future<void> delete(int id) async {
-    db.child('groceries').child(id.toString()).remove();
+  Future<void> delete(int id) {
+    return db.child('groceries').child(id.toString()).remove();
   }
 
   @override
-  Future<Grocery> get(int id) async {
+  Future<Grocery> get(int id) {
     return db.child('groceries').child(id.toString()).once().then((DataSnapshot dataSnapshot) {
       return Grocery()
         ..id = id
@@ -61,9 +62,8 @@ class GroceriesFirebaseDB implements GroceriesDBWorker {
   }
 
   @override
-  Future<List<Grocery>> getAll() async {
+  Future<List<Grocery>> getAll() {
     return db.child('groceries').once().then((DataSnapshot dataSnapshot) {
-      print('Getall: Length: ${dataSnapshot.value.length}. Value: ${dataSnapshot.value}');
       if (dataSnapshot.value.length == 0) return [];
       var result = List<Grocery>();
       for (int i = 0; i < dataSnapshot.value.length; i++) {
@@ -81,9 +81,8 @@ class GroceriesFirebaseDB implements GroceriesDBWorker {
   }
 
   @override
-  Future<int> update(Grocery grocery) async {
-    db.child('groceries').child(grocery.id.toString()).update({'name': grocery.name, 'storeNames': grocery.getStoreNames(), 'storePrices': grocery.getPrices()});
-    return grocery.id;
+  Future<void> update(Grocery grocery) {
+    return db.child('groceries').child(grocery.id.toString()).update({'name': grocery.name, 'storeNames': grocery.getStoreNames(), 'storePrices': grocery.getPrices()});
   }
 
   List<ItemDetail> _detailsFromJSON(var json) {

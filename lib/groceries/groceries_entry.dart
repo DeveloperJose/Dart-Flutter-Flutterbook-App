@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutterbook/image_mixin.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:scoped_model/scoped_model.dart';
@@ -70,13 +71,17 @@ class GroceriesEntry extends StatelessWidget with ImageMixin {
 
   /// Builds an individual store card which shows the information that can be inputted per store
   Widget _buildStoreEditCard(GroceriesModel model, int index) => Card(
-        elevation: 8,
-        color: Colors.blue[200],
+      elevation: 8,
+      color: Colors.blue[200],
+      child: Slidable(
+        actionPane: SlidableDrawerActionPane(),
+        actionExtentRatio: .2,
+        secondaryActions: [IconSlideAction(caption: "Delete", color: Colors.red, icon: Icons.delete, onTap: () => model.removeDetail(index))],
         child: Column(children: [
           _buildStoreNameEditor(model, index),
           _buildStorePriceEditor(model, index),
         ]),
-      );
+      ));
 
   /// Builds the form field that edits the name of one store
   ListTile _buildStoreNameEditor(GroceriesModel model, int index) => ListTile(

@@ -12,14 +12,6 @@ import 'tasks/tasks.dart';
 void main() {
   startMeUp() async {
     WidgetsFlutterBinding.ensureInitialized();
-    final FirebaseApp app = await FirebaseApp.configure(
-      name: 'db2',
-      options: const FirebaseOptions(
-        googleAppID: '1:660548530048:android:6fe21ff0cf3233ba285b65',
-        apiKey: 'AIzaSyANal-1qHpn6-4EeCusIKGiQ631SRS_-xM',
-        databaseURL: 'https://flutterbook-d66ac.firebaseio.com/',
-      ),
-    );
     ImageMixin.docsDir = await getApplicationDocumentsDirectory();
     runApp(FlutterBook());
   }
